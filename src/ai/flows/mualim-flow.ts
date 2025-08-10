@@ -63,7 +63,7 @@ export async function getGeminiResponse(skill: Skill, input: any, language: "Urd
     const prompt = `${systemPrompt}\n\n${userContent}`;
 
     const { output } = await ai.generate({
-        model: 'gemini-1.5-flash',
+        model: 'googleai/gemini-1.5-flash',
         prompt: prompt,
         output: {
             schema: MualimOutputSchema
