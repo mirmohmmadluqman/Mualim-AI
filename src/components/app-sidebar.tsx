@@ -24,6 +24,7 @@ import {
   DropdownMenuContent,
   DropdownMenuItem,
   DropdownMenuTrigger,
+  DropdownMenuSeparator,
 } from "@/components/ui/dropdown-menu";
 
 export type Skill =
@@ -61,7 +62,7 @@ export function AppSidebar({ activeSkill, setActiveSkill }: AppSidebarProps) {
                 </button>
               </DropdownMenuTrigger>
               <DropdownMenuContent align="start">
-                <DropdownMenuItem asChild>
+                 <DropdownMenuItem asChild>
                   <a href="https://mirmohmmadluqman.netlify.app/" target="_blank" rel="noopener noreferrer">
                     Portfolio
                   </a>
@@ -72,9 +73,13 @@ export function AppSidebar({ activeSkill, setActiveSkill }: AppSidebarProps) {
                   </a>
                 </DropdownMenuItem>
                 <DropdownMenuItem asChild>
-                  <a href="https://twitter.com/mirmohmmadluqman" target="_blank" rel="noopener noreferrer">
+                  <a href="https://twitter.com/mirmohmadluqman" target="_blank" rel="noopener noreferrer">
                     X/Twitter
                   </a>
+                </DropdownMenuItem>
+                <DropdownMenuSeparator />
+                <DropdownMenuItem onSelect={() => window.location.href = 'mailto:0x867012e82708278fbda998030ace0aa9f14fd83e@dmail.ai'}>
+                    Email
                 </DropdownMenuItem>
               </DropdownMenuContent>
             </DropdownMenu>
