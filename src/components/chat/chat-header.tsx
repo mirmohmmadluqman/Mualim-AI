@@ -38,6 +38,22 @@ interface ChatHeaderProps {
   onExportChat: () => void;
 }
 
+const languages: {value: Language, label: string}[] = [
+    { value: "Recommended", label: "Recommended" },
+    { value: "English", label: "English" },
+    { value: "Urdu", label: "Urdu" },
+    { value: "Arabic", label: "Arabic (العربية)" },
+    { value: "Bengali", label: "Bengali (বাংলা)" },
+    { value: "French", label: "French (Français)" },
+    { value: "German", label: "German (Deutsch)" },
+    { value: "Hindi", label: "Hindi (हिन्दी)" },
+    { value: "Indonesian", label: "Indonesian (Bahasa Indonesia)" },
+    { value: "Malay", label: "Malay (Bahasa Melayu)" },
+    { value: "Russian", label: "Russian (Русский)" },
+    { value: "Spanish", label: "Spanish (Español)" },
+    { value: "Turkish", label: "Turkish (Türkçe)" },
+]
+
 export function ChatHeader({
   language,
   setLanguage,
@@ -102,9 +118,9 @@ export function ChatHeader({
                 <SelectValue placeholder="Language" />
               </SelectTrigger>
               <SelectContent>
-                <SelectItem value="Recommended">Recommended</SelectItem>
-                <SelectItem value="Urdu">Urdu</SelectItem>
-                <SelectItem value="English">English</SelectItem>
+                {languages.map(lang => (
+                    <SelectItem key={lang.value} value={lang.value}>{lang.label}</SelectItem>
+                ))}
               </SelectContent>
             </Select>
           </DropdownMenuContent>

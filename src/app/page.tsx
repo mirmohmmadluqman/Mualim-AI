@@ -14,7 +14,21 @@ export type Skill =
   | "concept-extraction"
   | "shamela-guidance";
 
-export type Language = "Urdu" | "English" | "Recommended";
+export type Language = 
+  | "Recommended" 
+  | "English" 
+  | "Urdu" 
+  | "Arabic"
+  | "Bengali"
+  | "French"
+  | "German"
+  | "Hindi"
+  | "Indonesian"
+  | "Malay"
+  | "Russian"
+  | "Spanish"
+  | "Turkish";
+
 
 export type Message = {
   id: string;
