@@ -53,7 +53,7 @@ I'm Mualim AI designed to provide Islamic knowledge grounded in the Salafi metho
 const CHAT_STORAGE_KEY = "mualim-ai-chat";
 
 export default function Home() {
-  const [messages, setMessages] = React.useState<Message[]>([]);
+  const [messages, setMessages] = React.useState<Message[]>(initialMessages);
   const [activeSkill, setActiveSkill] = React.useState<Skill>("summarization");
   const [isLoading, setIsLoading] = React.useState(false);
   const [language, setLanguage] = React.useState<Language>("Recommended");
@@ -64,7 +64,7 @@ export default function Home() {
   React.useEffect(() => {
     try {
       const savedMessages = localStorage.getItem(CHAT_STORAGE_KEY);
-      if (savedMessages) {
+      if (savedMessages && JSON.parse(savedMessages).length > 0) {
         setMessages(JSON.parse(savedMessages));
       } else {
         setMessages(initialMessages);
@@ -77,7 +77,8 @@ export default function Home() {
 
   React.useEffect(() => {
     try {
-      if (messages.length > 0) {
+      // Don't save the initial message to local storage
+      if (messages.length > 1 || (messages.length === 1 && messages[0].id !== initialMessages[0].id)) {
         localStorage.setItem(CHAT_STORAGE_KEY, JSON.stringify(messages));
       }
     } catch (error) {
