@@ -1,3 +1,4 @@
+
 "use client";
 
 import * as React from "react";
@@ -18,6 +19,12 @@ import {
   SidebarMenuButton,
   SidebarFooter,
 } from "@/components/ui/sidebar";
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuTrigger,
+} from "@/components/ui/dropdown-menu";
 
 export type Skill =
   | "fiqh-comparison"
@@ -47,7 +54,30 @@ export function AppSidebar({ activeSkill, setActiveSkill }: AppSidebarProps) {
             <h2 className="text-lg font-semibold tracking-tight font-headline">
               Mualim AI
             </h2>
-            <p className="text-xs text-muted-foreground">by Sheikh AI al-GPT</p>
+            <DropdownMenu>
+              <DropdownMenuTrigger asChild>
+                <button className="text-xs text-muted-foreground hover:text-foreground transition-colors text-left">
+                  by Mir Mohmmad Luqman
+                </button>
+              </DropdownMenuTrigger>
+              <DropdownMenuContent align="start">
+                <DropdownMenuItem asChild>
+                  <a href="https://mirmohmmadluqman.netlify.app/" target="_blank" rel="noopener noreferrer">
+                    Portfolio
+                  </a>
+                </DropdownMenuItem>
+                <DropdownMenuItem asChild>
+                  <a href="https://github.com/mirmohmmadluqman" target="_blank" rel="noopener noreferrer">
+                    Github
+                  </a>
+                </DropdownMenuItem>
+                <DropdownMenuItem asChild>
+                  <a href="https://twitter.com/mirmohmmadluqman" target="_blank" rel="noopener noreferrer">
+                    X/Twitter
+                  </a>
+                </DropdownMenuItem>
+              </DropdownMenuContent>
+            </DropdownMenu>
           </div>
         </div>
       </SidebarHeader>
