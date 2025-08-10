@@ -56,6 +56,21 @@ export default function Home() {
   }) => {
     setIsLoading(true);
 
+    let userInput = {};
+    let userInputContent = "";
+
+    if (activeSkill === "fiqh-comparison") {
+      const topic = input.topic!;
+      const sources = input.sources!;
+      userInput = { topic, sources };
+      userInputContent = `Topic: ${topic}\nSources: ${sources}`;
+      addMessage("user", userInputContent, "fiqh-comparison-input");
+    } else {
+      userInputContent = input.single!;
+      userInput = { text: userInputContent, query: userInputContent };
+      addMessage("user", userInputContent);
+    }
+    
     if (activeModel === 'openai') {
         toast({
             title: "Under Development",
@@ -65,49 +80,26 @@ export default function Home() {
         return;
     }
 
-    if (activeSkill === "fiqh-comparison") {
-      const topic = input.topic!;
-      const sources = input.sources!;
-      const userInputContent = `Topic: ${topic}\nSources: ${sources}`;
-      addMessage("user", userInputContent, "fiqh-comparison-input");
-
-      try {
-        const result = await getAiResponse(
-          activeModel,
-          activeSkill,
-          { topic, sources },
-          language
-        );
-        addMessage("ai", result.content);
-      } catch (error) {
-        console.error(error);
-        toast({
-          variant: "destructive",
-          title: "An error occurred",
-          description: "Failed to get a response from the AI.",
-        });
-      }
-    } else {
-      const userInputContent = input.single!;
-      addMessage("user", userInputContent);
-
-      try {
-        const result = await getAiResponse(
-          activeModel,
-          activeSkill,
-          { text: userInputContent, query: userInputContent },
-          language
-        );
-        addMessage("ai", result.content);
-      } catch (error) {
-        console.error(error);
-        toast({
-          variant: "destructive",
-          title: "An error occurred",
-          description: "Failed to get a response from the AI.",
-        });
-      }
+    try {
+      const result = await getAiResponse(
+        activeModel,
+        activeSkill,
+        userInput,
+        language
+      );
+      addMessage("ai", result.content);
+    } catch (error) {
+      console.error(error);
+      const errorMessage = error instanceof Error ? error.message : "Failed to get a response from the AI.";
+      toast({
+        variant: "destructive",
+        title: "An error occurred",
+        description: errorMessage,
+      });
+      // Optionally add an error message to the chat
+      addMessage("ai", `Sorry, an error occurred: ${errorMessage}`);
     }
+
 
     setIsLoading(false);
   };

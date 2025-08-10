@@ -49,28 +49,25 @@ const getUserContent = (skill: Skill, input: any): string => {
     }
 }
 
-const mualimPrompt = ai.definePrompt({
-    name: 'mualimPrompt',
-    input: { schema: MualimInputSchema },
-    output: { schema: MualimOutputSchema },
-    prompt: `{{getSystemPrompt skill language}}
-
-{{getUserContent skill input}}`,
-    config: {
-        model: 'gemini-1.5-flash-latest',
-    },
-    customizers: {
-        getSystemPrompt: (skill: Skill, language: "Urdu" | "English") => getSystemPrompt(skill, language),
-        getUserContent: (skill: Skill, input: any) => getUserContent(skill, input),
-    },
-});
-
 export async function getGeminiResponse(skill: Skill, input: any, language: "Urdu" | "English"): Promise<{ content: string }> {
     if (!process.env.GEMINI_API_KEY) {
         return {
             content: "The Gemini API key is not configured. Please set the GEMINI_API_KEY environment variable."
         }
     }
-    const { output } = await mualimPrompt({ skill, language, input });
+
+    const systemPrompt = getSystemPrompt(skill, language);
+    const userContent = getUserContent(skill, input);
+
+    const prompt = `${systemPrompt}\n\n${userContent}`;
+
+    const { output } = await ai.generate({
+        model: 'gemini-1.5-flash-latest',
+        prompt: prompt,
+        output: {
+            schema: MualimOutputSchema
+        }
+    });
+    
     return output ?? { content: "I'm sorry, I couldn't generate a response." };
 }
