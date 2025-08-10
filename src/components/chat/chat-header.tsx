@@ -9,20 +9,37 @@ import {
   SelectValue,
 } from "@/components/ui/select";
 import { SidebarTrigger } from "../ui/sidebar";
+import { type AIModel } from "@/app/actions";
+import { Separator } from "../ui/separator";
 
 interface ChatHeaderProps {
   language: "Urdu" | "English";
   setLanguage: (lang: "Urdu" | "English") => void;
+  activeModel: AIModel;
+  setActiveModel: (model: AIModel) => void;
 }
 
-export function ChatHeader({ language, setLanguage }: ChatHeaderProps) {
+export function ChatHeader({ language, setLanguage, activeModel, setActiveModel }: ChatHeaderProps) {
   return (
     <header className="flex items-center justify-between p-4 border-b bg-background">
       <div className="flex items-center gap-2">
          <SidebarTrigger className="md:hidden"/>
         <h1 className="text-xl font-bold font-headline">Mualim AI Chat</h1>
       </div>
-      <div>
+      <div className="flex items-center gap-4">
+        <Select
+          value={activeModel}
+          onValueChange={(value: AIModel) => setActiveModel(value)}
+        >
+          <SelectTrigger className="w-[150px]">
+            <SelectValue placeholder="Select Model" />
+          </SelectTrigger>
+          <SelectContent>
+            <SelectItem value="gemini">2.0 Flash (Gemini)</SelectItem>
+            <SelectItem value="openai">OAI 3 (OpenAI)</SelectItem>
+          </SelectContent>
+        </Select>
+        <Separator orientation="vertical" className="h-6"/>
         <Select
           value={language}
           onValueChange={(value: "Urdu" | "English") => setLanguage(value)}

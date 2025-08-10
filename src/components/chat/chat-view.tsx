@@ -6,6 +6,7 @@ import { ChatMessage } from "./chat-message";
 import { ChatInput } from "./chat-input";
 import { ChatHeader } from "./chat-header";
 import { ScrollArea } from "@/components/ui/scroll-area";
+import { type AIModel } from "@/app/actions";
 
 interface ChatViewProps {
   messages: Message[];
@@ -18,6 +19,8 @@ interface ChatViewProps {
     topic?: string;
     sources?: string;
   }) => Promise<void>;
+  activeModel: AIModel;
+  setActiveModel: (model: AIModel) => void;
 }
 
 export function ChatView({
@@ -27,6 +30,8 @@ export function ChatView({
   language,
   setLanguage,
   onSendMessage,
+  activeModel,
+  setActiveModel
 }: ChatViewProps) {
   const scrollAreaRef = React.useRef<HTMLDivElement>(null);
   const messagesEndRef = React.useRef<HTMLDivElement>(null);
@@ -41,7 +46,7 @@ export function ChatView({
 
   return (
     <div className="flex flex-col h-full bg-muted/50 dark:bg-card">
-      <ChatHeader language={language} setLanguage={setLanguage} />
+      <ChatHeader language={language} setLanguage={setLanguage} activeModel={activeModel} setActiveModel={setActiveModel} />
       <ScrollArea className="flex-1" ref={scrollAreaRef}>
         <div className="px-4 py-6 sm:px-6 lg:px-8">
           <div className="space-y-6">

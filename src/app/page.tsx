@@ -3,21 +3,22 @@
 import * as React from "react";
 import { v4 as uuidv4 } from "uuid";
 import { SidebarProvider } from "@/components/ui/sidebar";
-import { AppSidebar, type Skill } from "@/components/app-sidebar";
+import { AppSidebar } from "@/components/app-sidebar";
 import { ChatView } from "@/components/chat/chat-view";
-import { getAiResponse } from "./actions";
+import { getAiResponse, type AIModel } from "./actions";
 import { useToast } from "@/hooks/use-toast";
+
+export type Skill =
+  | "fiqh-comparison"
+  | "summarization"
+  | "concept-extraction"
+  | "shamela-guidance";
 
 export type Message = {
   id: string;
   role: "user" | "ai";
   content: string;
   type?: "fiqh-comparison-input";
-};
-
-type FiqhComparisonState = {
-  stage: "awaiting-topic" | "awaiting-sources";
-  topic: string;
 };
 
 const initialMessages: Message[] = [
@@ -40,9 +41,8 @@ export default function Home() {
   const [activeSkill, setActiveSkill] = React.useState<Skill>("summarization");
   const [isLoading, setIsLoading] = React.useState(false);
   const [language, setLanguage] = React.useState<"Urdu" | "English">("Urdu");
-  const [fiqhState, setFiqhState] = React.useState<FiqhComparisonState | null>(
-    null
-  );
+  const [activeModel, setActiveModel] = React.useState<AIModel>("gemini");
+  
   const { toast } = useToast();
 
   const addMessage = (role: "user" | "ai", content: string, type?: Message['type']) => {
@@ -56,6 +56,15 @@ export default function Home() {
   }) => {
     setIsLoading(true);
 
+    if (activeModel === 'openai') {
+        toast({
+            title: "Under Development",
+            description: "The OpenAI model is currently under development. Please use Gemini 2.0 Flash."
+        });
+        setIsLoading(false);
+        return;
+    }
+
     if (activeSkill === "fiqh-comparison") {
       const topic = input.topic!;
       const sources = input.sources!;
@@ -64,6 +73,7 @@ export default function Home() {
 
       try {
         const result = await getAiResponse(
+          activeModel,
           activeSkill,
           { topic, sources },
           language
@@ -83,6 +93,7 @@ export default function Home() {
 
       try {
         const result = await getAiResponse(
+          activeModel,
           activeSkill,
           { text: userInputContent, query: userInputContent },
           language
@@ -101,11 +112,6 @@ export default function Home() {
     setIsLoading(false);
   };
 
-  React.useEffect(() => {
-    // When the skill changes, reset any multi-step conversation state.
-    setFiqhState(null);
-  }, [activeSkill]);
-
   return (
     <SidebarProvider>
       <div className="flex min-h-screen bg-background">
@@ -118,6 +124,8 @@ export default function Home() {
             language={language}
             setLanguage={setLanguage}
             onSendMessage={handleSendMessage}
+            activeModel={activeModel}
+            setActiveModel={setActiveModel}
           />
         </main>
       </div>

@@ -1,12 +1,10 @@
 "use server";
 
 import OpenAI from "openai";
+import { getGeminiResponse } from "@/ai/flows/mualim-flow";
+import { type Skill } from "./page";
 
-export type Skill =
-  | "fiqh-comparison"
-  | "summarization"
-  | "concept-extraction"
-  | "shamela-guidance";
+export type AIModel = "gemini" | "openai";
 
 const openai = new OpenAI({
   apiKey: process.env.OPENAI_API_KEY,
@@ -43,8 +41,7 @@ const getUserContent = (skill: Skill, input: any): string => {
     }
 }
 
-
-export async function getAiResponse(
+async function getOpenAiResponse(
   skill: Skill,
   input: any,
   language: "Urdu" | "English"
@@ -64,7 +61,7 @@ export async function getAiResponse(
             { role: "system", content: systemPrompt },
             { role: "user", content: userContent },
         ],
-        model: "gpt-4-turbo-preview",
+        model: "gpt-3.5-turbo",
     });
 
     const content = completion.choices[0]?.message?.content ?? "I'm sorry, I couldn't generate a response.";
@@ -80,4 +77,17 @@ export async function getAiResponse(
       content: errorMessage,
     };
   }
+}
+
+
+export async function getAiResponse(
+  model: AIModel,
+  skill: Skill,
+  input: any,
+  language: "Urdu" | "English"
+): Promise<{ content: string }> {
+  if (model === 'gemini') {
+    return getGeminiResponse(skill, input, language);
+  }
+  return getOpenAiResponse(skill, input, language);
 }
