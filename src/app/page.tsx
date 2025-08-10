@@ -26,24 +26,45 @@ const initialMessages: Message[] = [
     id: uuidv4(),
     role: "ai",
     content:
-      "As-salamu alaykum! I'm Sheikh AI al-GPT, a customized AI designed to provide Islamic knowledge grounded in the Salafi methodology. How can I assist you today?",
-  },
-  {
-    id: uuidv4(),
-    role: "ai",
-    content:
-      "You can select one of my special skills from the sidebar to begin. I can help with:\n\n- **Summarization**: Give me a text, and I'll provide a concise summary.\n- **Fiqh Comparisons**: Let's compare rulings from different scholars.\n- **Concept Extraction**: I can identify core themes from a book or chapter.\n- **Shamela Search Guidance**: I can guide you to find what you need in Shamela's digital library.",
-  },
+      "السلام عليكم ورحمة الله وبركاته\n\nAs-salamu alaykum! I'm Sheikh AI al-GPT, a customized AI designed to provide Islamic knowledge grounded in the Salafi methodology. How can I assist you today?",
+  }
 ];
 
+const CHAT_STORAGE_KEY = "mualim-ai-chat";
+
 export default function Home() {
-  const [messages, setMessages] = React.useState<Message[]>(initialMessages);
+  const [messages, setMessages] = React.useState<Message[]>([]);
   const [activeSkill, setActiveSkill] = React.useState<Skill>("summarization");
   const [isLoading, setIsLoading] = React.useState(false);
   const [language, setLanguage] = React.useState<"Urdu" | "English">("Urdu");
   const [activeModel, setActiveModel] = React.useState<AIModel>("gemini");
   
   const { toast } = useToast();
+
+  React.useEffect(() => {
+    try {
+      const savedMessages = localStorage.getItem(CHAT_STORAGE_KEY);
+      if (savedMessages) {
+        setMessages(JSON.parse(savedMessages));
+      } else {
+        setMessages(initialMessages);
+      }
+    } catch (error) {
+      console.error("Failed to load messages from local storage", error);
+      setMessages(initialMessages);
+    }
+  }, []);
+
+  React.useEffect(() => {
+    try {
+      if (messages.length > 0) {
+        localStorage.setItem(CHAT_STORAGE_KEY, JSON.stringify(messages));
+      }
+    } catch (error) {
+      console.error("Failed to save messages to local storage", error);
+    }
+  }, [messages]);
+
 
   const addMessage = (role: "user" | "ai", content: string, type?: Message['type']) => {
     setMessages((prev) => [...prev, { id: uuidv4(), role, content, type }]);
@@ -96,13 +117,29 @@ export default function Home() {
         title: "An error occurred",
         description: errorMessage,
       });
-      // Optionally add an error message to the chat
       addMessage("ai", `Sorry, an error occurred: ${errorMessage}`);
     }
 
 
     setIsLoading(false);
   };
+
+  const exportChat = () => {
+    const chatContent = messages.map(m => `[${m.role.toUpperCase()}]\n${m.content}`).join('\n\n---\n\n');
+    const blob = new Blob([chatContent], { type: 'text/plain;charset=utf-8' });
+    const url = URL.createObjectURL(blob);
+    const a = document.createElement('a');
+    a.href = url;
+    a.download = `mualim-ai-chat-${new Date().toISOString()}.txt`;
+    document.body.appendChild(a);
+    a.click();
+    document.body.removeChild(a);
+    URL.revokeObjectURL(url);
+     toast({
+      title: "Chat Exported",
+      description: "Your conversation has been downloaded as a text file.",
+    });
+  }
 
   return (
     <SidebarProvider>
@@ -118,6 +155,7 @@ export default function Home() {
             onSendMessage={handleSendMessage}
             activeModel={activeModel}
             setActiveModel={setActiveModel}
+            onExportChat={exportChat}
           />
         </main>
       </div>

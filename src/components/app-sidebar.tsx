@@ -8,7 +8,8 @@ import {
   MessagesSquare,
   Scale,
   Search,
-  BookText
+  BookText,
+  Download
 } from "lucide-react";
 import {
   Sidebar,

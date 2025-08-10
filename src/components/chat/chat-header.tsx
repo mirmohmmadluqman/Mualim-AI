@@ -1,6 +1,7 @@
 "use client";
 
 import * as React from "react";
+import { Download } from "lucide-react";
 import {
   Select,
   SelectContent,
@@ -11,15 +12,23 @@ import {
 import { SidebarTrigger } from "../ui/sidebar";
 import { type AIModel } from "@/app/actions";
 import { Separator } from "../ui/separator";
+import { Button } from "../ui/button";
+import {
+  Tooltip,
+  TooltipContent,
+  TooltipProvider,
+  TooltipTrigger,
+} from "@/components/ui/tooltip"
 
 interface ChatHeaderProps {
   language: "Urdu" | "English";
   setLanguage: (lang: "Urdu" | "English") => void;
   activeModel: AIModel;
   setActiveModel: (model: AIModel) => void;
+  onExportChat: () => void;
 }
 
-export function ChatHeader({ language, setLanguage, activeModel, setActiveModel }: ChatHeaderProps) {
+export function ChatHeader({ language, setLanguage, activeModel, setActiveModel, onExportChat }: ChatHeaderProps) {
   return (
     <header className="flex items-center justify-between p-4 border-b bg-background">
       <div className="flex items-center gap-2">
@@ -52,6 +61,20 @@ export function ChatHeader({ language, setLanguage, activeModel, setActiveModel 
             <SelectItem value="English">English</SelectItem>
           </SelectContent>
         </Select>
+        <Separator orientation="vertical" className="h-6"/>
+        <TooltipProvider>
+          <Tooltip>
+            <TooltipTrigger asChild>
+              <Button variant="ghost" size="icon" onClick={onExportChat}>
+                <Download className="w-5 h-5" />
+                <span className="sr-only">Export Chat</span>
+              </Button>
+            </TooltipTrigger>
+            <TooltipContent>
+              <p>Export Chat</p>
+            </TooltipContent>
+          </Tooltip>
+        </TooltipProvider>
       </div>
     </header>
   );
