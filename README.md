@@ -11,6 +11,21 @@ Built with **Firebase**, **Google Cloud**, and the **OpenAI API**, it allows res
 
 ---
 
+### Preveiw:
+
+## Chat:
+
+<img width="1402" height="953" alt="Chate Image #1" src="https://github.com/user-attachments/assets/1358ba3a-33dd-4660-a272-fed9bd4fc390" />
+<img width="1388" height="955" alt="Chate Image #2" src="https://github.com/user-attachments/assets/b6586203-0136-4fbb-a81e-91ebe85a277a" />
+
+## Settings:
+
+<img width="1920" height="1080" alt="Setting-Image" src="https://github.com/user-attachments/assets/33389948-1085-459b-9a48-f6be2e04ccfb" />
+
+
+
+---
+
 ## Getting Started
 
 ### Prerequisites
