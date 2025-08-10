@@ -27,8 +27,12 @@ const initialMessages: Message[] = [
   {
     id: uuidv4(),
     role: "ai",
-    content:
-      "السلام عليكم ورحمة الله وبركاته\n\nAs-salamu alaykum! I'm Sheikh AI al-GPT, a customized AI designed to provide Islamic knowledge grounded in the Salafi methodology. How can I assist you today?",
+    content: `A message from developer to you
+
+السلام عليكم ورحمة الله وبركاته
+
+I'm Mualim AI designed to provide Islamic knowledge grounded in the Salafi methodology. How can I assist you today?
+---`,
   }
 ];
 

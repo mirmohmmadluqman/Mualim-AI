@@ -25,11 +25,23 @@ export function ChatMessage({ message, isLoading = false }: ChatMessageProps) {
 
   const contentWithCitations = React.useMemo(() => {
     if (!message || isLoading) return "";
-    const processedContent = message.content.replace(
-      /(\(Qur'an[^)]*\))|(\(Hadith[^)]*\))|(\(Sahih Bukhari[^)]*\))|(\(Sahih Muslim[^)]*\))|(\(Shamela\.ws[^)]*\))|(\b(Hanafi|Shafi'i|Maliki|Hanbali)\b)/g,
-      (match) =>
-        `<span class="font-islamic bg-yellow-200/50 dark:bg-yellow-500/30 px-1.5 py-0.5 rounded-md inline-block whitespace-nowrap">${match}</span>`
+    let processedContent = message.content;
+    
+    // Regex to find Arabic/Urdu script
+    const arabicScriptRegex = /([\u0600-\u06FF\u0750-\u077F\u08A0-\u08FF\uFB50-\uFDFF\uFE70-\uFEFF\s.()]+)/g;
+    processedContent = processedContent.replace(
+      arabicScriptRegex,
+      (match) => `<span class="text-lg">${match}</span>`
     );
+
+    // Regex for citations
+    const citationRegex = /(\(Qur'an[^)]*\))|(\(Hadith[^)]*\))|(\(Sahih Bukhari[^)]*\))|(\(Sahih Muslim[^)]*\))|(\(Shamela\.ws[^)]*\))|(\b(Hanafi|Shafi'i|Maliki|Hanbali)\b)/g;
+    processedContent = processedContent.replace(
+      citationRegex,
+      (match) =>
+        `<span class="font-islamic bg-yellow-200/50 dark:bg-yellow-500/30 px-1.5 py-0.5 rounded-md inline-block whitespace-nowrap">${match.replace(/<span class="text-lg">|<\/span>/g, '')}</span>`
+    );
+    
     return processedContent.replace(/\n/g, "<br />");
   }, [message, isLoading]);
   
