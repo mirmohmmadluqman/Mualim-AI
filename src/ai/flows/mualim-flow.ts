@@ -20,18 +20,19 @@ export type MualimOutput = z.infer<typeof MualimOutputSchema>;
 
 const getSystemPrompt = (skill: Skill, language: "Urdu" | "English"): string => {
     const languageInstruction = `(Important: Please provide the answer in clear ${language}.)`;
+    const referenceInstruction = "Please provide references at the bottom of your response.";
 
     switch (skill) {
       case "fiqh-comparison":
-        return `You are an expert in Islamic jurisprudence (Fiqh). You will compare the rulings on a specified topic from given sources and provide a detailed comparison. ${languageInstruction}`;
+        return `You are an expert in Islamic jurisprudence (Fiqh). You will compare the rulings on a specified topic from given sources and provide a detailed comparison. ${languageInstruction} ${referenceInstruction}`;
       case "summarization":
-        return `You are an expert in Islamic texts and summarization. Please provide a concise summary of the key points in the following text. ${languageInstruction}`;
+        return `You are an expert in Islamic texts and summarization. Please provide a concise summary of the key points in the following text. ${languageInstruction} ${referenceInstruction}`;
       case "concept-extraction":
-        return `You are an expert in Islamic studies. Please read the following text and extract the core themes or concepts. Return a bulleted list. ${languageInstruction}`;
+        return `You are an expert in Islamic studies. Please read the following text and extract the core themes or concepts. Return a bulleted list. ${languageInstruction} ${referenceInstruction}`;
       case "shamela-guidance":
-        return `You are an expert in using the Shamela digital library. Guide the user step-by-step to find the information they are looking for. Provide a numbered list of steps. Be as specific as possible, including search terms, book names, and chapter titles if applicable. ${languageInstruction}`;
+        return `You are an expert in using the Shamela digital library. Guide the user step-by-step to find the information they are looking for. Provide a numbered list of steps. Be as specific as possible, including search terms, book names, and chapter titles if applicable. ${languageInstruction} ${referenceInstruction}`;
       default:
-        return `You are a helpful AI assistant. ${languageInstruction}`;
+        return `You are a helpful AI assistant. ${languageInstruction} ${referenceInstruction}`;
     }
 }
 
