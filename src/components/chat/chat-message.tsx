@@ -1,5 +1,6 @@
 "use client";
 
+import * as React from 'react';
 import { type Message } from "@/app/page";
 import { cn } from "@/lib/utils";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
