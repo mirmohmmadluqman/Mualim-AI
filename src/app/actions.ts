@@ -2,6 +2,7 @@
 
 import OpenAI from "openai";
 import { getGeminiResponse } from "@/ai/flows/mualim-flow";
+import { getAudioForText } from "@/ai/flows/tts-flow";
 import { type Skill, type Language } from "./page";
 
 export type AIModel = "gemini" | "openai";
@@ -92,4 +93,18 @@ export async function getAiResponse(
     return getGeminiResponse(skill, input, language);
   }
   return getOpenAiResponse(skill, input, language);
+}
+
+
+export async function getAudioResponse(
+  text: string
+): Promise<{ audio: string } | { error: string }> {
+  try {
+    const result = await getAudioForText(text);
+    return { audio: result.media };
+  } catch (error) {
+    console.error("TTS Action Error:", error);
+    const errorMessage = error instanceof Error ? error.message : "Failed to generate audio.";
+    return { error: errorMessage };
+  }
 }

@@ -1,12 +1,20 @@
 "use client";
 
 import * as React from "react";
-import { SendHorizonal } from "lucide-react";
+import { Mic, SendHorizonal } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Textarea } from "@/components/ui/textarea";
 import { type Skill } from "@/app/page";
 import { Label } from "../ui/label";
 import { Input } from "../ui/input";
+import { useToast } from "@/hooks/use-toast";
+import {
+  Tooltip,
+  TooltipContent,
+  TooltipProvider,
+  TooltipTrigger,
+} from "@/components/ui/tooltip";
+
 
 interface ChatInputProps {
   activeSkill: Skill;
@@ -26,6 +34,9 @@ export function ChatInput({
   const [singleInput, setSingleInput] = React.useState("");
   const [topicInput, setTopicInput] = React.useState("");
   const [sourcesInput, setSourcesInput] = React.useState("");
+  const [isListening, setIsListening] = React.useState(false);
+  const recognitionRef = React.useRef<any>(null);
+  const { toast } = useToast();
 
   const singleInputRef = React.useRef<HTMLTextAreaElement>(null);
 
@@ -44,6 +55,57 @@ export function ChatInput({
         onSendMessage({ single: singleInput });
         setSingleInput("");
       }
+    }
+  };
+
+   React.useEffect(() => {
+    const SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition;
+    if (SpeechRecognition) {
+      recognitionRef.current = new SpeechRecognition();
+      recognitionRef.current.continuous = false;
+      recognitionRef.current.interimResults = false;
+      recognitionRef.current.lang = 'en-US';
+
+      recognitionRef.current.onresult = (event: any) => {
+        const transcript = event.results[0][0].transcript;
+        setSingleInput(transcript);
+        setIsListening(false);
+      };
+
+      recognitionRef.current.onerror = (event: any) => {
+        console.error("Speech recognition error", event.error);
+        toast({
+            variant: "destructive",
+            title: "Speech Recognition Error",
+            description: event.error === 'not-allowed' 
+                ? "Microphone access was denied. Please allow microphone access in your browser settings."
+                : `An error occurred: ${event.error}`
+        });
+        setIsListening(false);
+      };
+      
+      recognitionRef.current.onend = () => {
+        setIsListening(false);
+      };
+
+    }
+  }, [toast]);
+
+  const handleMicClick = () => {
+    if (!recognitionRef.current) {
+         toast({
+            variant: "destructive",
+            title: "Browser Not Supported",
+            description: "Your browser does not support speech recognition.",
+        });
+      return;
+    }
+    if (isListening) {
+      recognitionRef.current.stop();
+      setIsListening(false);
+    } else {
+      recognitionRef.current.start();
+      setIsListening(true);
     }
   };
 
@@ -94,7 +156,7 @@ export function ChatInput({
             </div>
         </div>
       ) : (
-        <div className="relative">
+        <div className="relative flex items-end gap-2">
           <Textarea
             ref={singleInputRef}
             value={singleInput}
@@ -106,19 +168,42 @@ export function ChatInput({
               }
             }}
             placeholder={placeholders[activeSkill]}
-            className="pr-14 min-h-[48px] max-h-48 resize-none"
+            className="pr-12 min-h-[48px] max-h-48 resize-none"
             rows={1}
             disabled={isLoading}
           />
-          <Button
-            type="submit"
-            size="icon"
-            className="absolute w-8 h-8 bottom-2 right-2"
-            disabled={isLoading || !singleInput}
-          >
-            <SendHorizonal className="w-5 h-5" />
-            <span className="sr-only">Send Message</span>
-          </Button>
+          <div className="flex gap-1">
+             <TooltipProvider>
+                <Tooltip>
+                    <TooltipTrigger asChild>
+                        <Button
+                            type="button"
+                            size="icon"
+                            variant={isListening ? "destructive" : "ghost"}
+                            className="w-8 h-8"
+                            onClick={handleMicClick}
+                            disabled={isLoading}
+                        >
+                            <Mic className="w-5 h-5" />
+                            <span className="sr-only">Use Microphone</span>
+                        </Button>
+                    </TooltipTrigger>
+                    <TooltipContent>
+                        <p>{isListening ? "Stop listening" : "Use Microphone"}</p>
+                    </TooltipContent>
+                </Tooltip>
+            </TooltipProvider>
+
+            <Button
+                type="submit"
+                size="icon"
+                className="w-8 h-8"
+                disabled={isLoading || !singleInput}
+            >
+                <SendHorizonal className="w-5 h-5" />
+                <span className="sr-only">Send Message</span>
+            </Button>
+          </div>
         </div>
       )}
     </form>

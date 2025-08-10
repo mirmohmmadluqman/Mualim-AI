@@ -4,6 +4,10 @@ import * as React from 'react';
 import { type Message } from "@/app/page";
 import { cn } from "@/lib/utils";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
+import { Button } from '../ui/button';
+import { Loader, Volume2 } from 'lucide-react';
+import { getAudioResponse } from '@/app/actions';
+import { useToast } from '@/hooks/use-toast';
 
 interface ChatMessageProps {
   message?: Message;
@@ -22,19 +26,52 @@ function LoadingDots() {
 
 export function ChatMessage({ message, isLoading = false }: ChatMessageProps) {
   const isAIMessage = message?.role === "ai" || isLoading;
+  const { toast } = useToast();
+  const [isSpeaking, setIsSpeaking] = React.useState(false);
+  const [audioSrc, setAudioSrc] = React.useState<string | null>(null);
+  const audioRef = React.useRef<HTMLAudioElement>(null);
+
+
+  const handlePlayAudio = async () => {
+    if (!message || !message.content) return;
+
+    if (audioSrc) {
+        audioRef.current?.play();
+        return;
+    }
+
+    setIsSpeaking(true);
+    const result = await getAudioResponse(message.content);
+    setIsSpeaking(false);
+
+    if ('audio' in result) {
+        setAudioSrc(result.audio);
+    } else {
+        toast({
+            variant: "destructive",
+            title: "Audio Error",
+            description: result.error,
+        });
+    }
+  };
+
+  React.useEffect(() => {
+    if (audioSrc && audioRef.current) {
+        audioRef.current.play();
+    }
+  }, [audioSrc]);
+
 
   const contentWithCitations = React.useMemo(() => {
     if (!message || isLoading) return "";
     let processedContent = message.content;
     
-    // Regex to find Arabic/Urdu script
     const arabicScriptRegex = /([\u0600-\u06FF\u0750-\u077F\u08A0-\u08FF\uFB50-\uFDFF\uFE70-\uFEFF\s.()]+)/g;
     processedContent = processedContent.replace(
       arabicScriptRegex,
       (match) => `<span class="text-lg">${match}</span>`
     );
 
-    // Regex for citations
     const citationRegex = /(\(Qur'an[^)]*\))|(\(Hadith[^)]*\))|(\(Sahih Bukhari[^)]*\))|(\(Sahih Muslim[^)]*\))|(\(Shamela\.ws[^)]*\))|(\b(Hanafi|Shafi'i|Maliki|Hanbali)\b)/g;
     processedContent = processedContent.replace(
       citationRegex,
@@ -76,19 +113,29 @@ export function ChatMessage({ message, isLoading = false }: ChatMessageProps) {
       )}
       <div
         className={cn(
-          "max-w-xl p-4 rounded-lg",
-          isAIMessage
+          "max-w-xl rounded-lg",
+           isAIMessage
             ? "bg-background shadow-sm"
             : "bg-primary/20 dark:bg-primary/10"
         )}
       >
-        {isLoading ? (
-          <LoadingDots />
-        ) : (
-          <p
-            className="text-sm leading-relaxed whitespace-pre-wrap"
-            dangerouslySetInnerHTML={{ __html: contentWithCitations }}
-          />
+        <div className="p-4">
+            {isLoading ? (
+            <LoadingDots />
+            ) : (
+            <p
+                className="text-sm leading-relaxed whitespace-pre-wrap"
+                dangerouslySetInnerHTML={{ __html: contentWithCitations }}
+            />
+            )}
+        </div>
+        {isAIMessage && !isLoading && (
+            <div className="px-2 pb-1 border-t border-border/50">
+                 <Button variant="ghost" size="icon" className="h-8 w-8 text-muted-foreground" onClick={handlePlayAudio} disabled={isSpeaking}>
+                    {isSpeaking ? <Loader className="animate-spin" /> : <Volume2 />}
+                    <span className="sr-only">Read aloud</span>
+                </Button>
+            </div>
         )}
       </div>
       {!isAIMessage && (
@@ -96,6 +143,7 @@ export function ChatMessage({ message, isLoading = false }: ChatMessageProps) {
           <AvatarFallback>U</AvatarFallback>
         </Avatar>
       )}
+      {audioSrc && <audio ref={audioRef} src={audioSrc} />}
     </div>
   );
 }
