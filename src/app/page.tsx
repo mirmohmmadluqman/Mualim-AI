@@ -14,6 +14,8 @@ export type Skill =
   | "concept-extraction"
   | "shamela-guidance";
 
+export type Language = "Urdu" | "English" | "Recommended";
+
 export type Message = {
   id: string;
   role: "user" | "ai";
@@ -36,7 +38,7 @@ export default function Home() {
   const [messages, setMessages] = React.useState<Message[]>([]);
   const [activeSkill, setActiveSkill] = React.useState<Skill>("summarization");
   const [isLoading, setIsLoading] = React.useState(false);
-  const [language, setLanguage] = React.useState<"Urdu" | "English">("Urdu");
+  const [language, setLanguage] = React.useState<Language>("Recommended");
   const [activeModel, setActiveModel] = React.useState<AIModel>("gemini");
   
   const { toast } = useToast();

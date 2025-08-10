@@ -1,7 +1,7 @@
 "use client";
 
 import * as React from "react";
-import { type Message, type Skill } from "@/app/page";
+import { type Message, type Skill, type Language } from "@/app/page";
 import { ChatMessage } from "./chat-message";
 import { ChatInput } from "./chat-input";
 import { ChatHeader } from "./chat-header";
@@ -12,8 +12,8 @@ interface ChatViewProps {
   messages: Message[];
   isLoading: boolean;
   activeSkill: Skill;
-  language: "Urdu" | "English";
-  setLanguage: (lang: "Urdu" | "English") => void;
+  language: Language;
+  setLanguage: (lang: Language) => void;
   onSendMessage: (input: {
     single?: string;
     topic?: string;

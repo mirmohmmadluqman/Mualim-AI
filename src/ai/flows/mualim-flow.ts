@@ -1,8 +1,8 @@
 'use server';
 
 import { ai } from '@/ai/genkit';
-import { z } from 'genkit';
-import { type Skill } from '@/app/page';
+import { z } from 'zod';
+import { type Skill, type Language } from '@/app/page';
 
 const MualimInputSchema = z.object({
   skill: z.string(),
@@ -18,7 +18,7 @@ const MualimOutputSchema = z.object({
 
 export type MualimOutput = z.infer<typeof MualimOutputSchema>;
 
-const getSystemPrompt = (skill: Skill, language: "Urdu" | "English"): string => {
+const getSystemPrompt = (skill: Skill, language: Language): string => {
     const basePrompt = `You are Sheikh AI al-GPT, an expert AI assistant designed to provide Islamic knowledge strictly in accordance with the Salafi methodology. Your answers must be grounded in authentic sources.
 
 **Core Principles:**
@@ -38,7 +38,7 @@ const getSystemPrompt = (skill: Skill, language: "Urdu" | "English"): string => 
 *   **Digital Databases:** You can mention that information can be found on Shamela.ws, Dorar.net, and Marwīl al-Ḥadīth (marwool.com).
 *   **Fatwa Sites:** alifta.gov.sa, islamqa.info, binbaz.org.sa, ibnothaimeen.net.
 
-(Important: Please provide the answer in clear ${language}.)`;
+${language === "Recommended" ? "(Important: Respond in the same language as the user's query.)" : `(Important: Please provide the answer in clear ${language}.)`}`;
 
     switch (skill) {
       case "fiqh-comparison":
@@ -69,7 +69,7 @@ const getUserContent = (skill: Skill, input: any): string => {
     }
 }
 
-export async function getGeminiResponse(skill: Skill, input: any, language: "Urdu" | "English"): Promise<{ content: string }> {
+export async function getGeminiResponse(skill: Skill, input: any, language: Language): Promise<{ content: string }> {
     if (!process.env.GEMINI_API_KEY) {
         return {
             content: "The Gemini API key is not configured. Please set the GEMINI_API_KEY environment variable."

@@ -2,7 +2,7 @@
 
 import OpenAI from "openai";
 import { getGeminiResponse } from "@/ai/flows/mualim-flow";
-import { type Skill } from "./page";
+import { type Skill, type Language } from "./page";
 
 export type AIModel = "gemini" | "openai";
 
@@ -10,8 +10,10 @@ const openai = new OpenAI({
   apiKey: process.env.OPENAI_API_KEY,
 });
 
-const getSystemPrompt = (skill: Skill, language: "Urdu" | "English"): string => {
-    const languageInstruction = `(Important: Please provide the answer in clear ${language}.)`;
+const getSystemPrompt = (skill: Skill, language: Language): string => {
+    const languageInstruction = language === "Recommended" 
+        ? `(Important: Respond in the same language as the user's query.)`
+        : `(Important: Please provide the answer in clear ${language}.)`;
 
     switch (skill) {
       case "fiqh-comparison":
@@ -44,7 +46,7 @@ const getUserContent = (skill: Skill, input: any): string => {
 async function getOpenAiResponse(
   skill: Skill,
   input: any,
-  language: "Urdu" | "English"
+  language: Language
 ): Promise<{ content: string }> {
   if (!process.env.OPENAI_API_KEY) {
       return {
@@ -84,7 +86,7 @@ export async function getAiResponse(
   model: AIModel,
   skill: Skill,
   input: any,
-  language: "Urdu" | "English"
+  language: Language
 ): Promise<{ content: string }> {
   if (model === 'gemini') {
     return getGeminiResponse(skill, input, language);
